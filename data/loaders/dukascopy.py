@@ -76,13 +76,13 @@ def display_available_instruments(group_filter: str = None):
             instruments = sorted(grouped_instruments[target_group])
             num_columns = 4 # Ile kolumn chcemy wyświetlić
             
-            # Obliczamy optymalną szerokość kolumny
+            # Obliczenie optymalnej szerokości kolumny
             col_width = max(len(name) for name in instruments) + 3
             
-            # Drukujemy w kolumnach
+            # Drukowanie w kolumnach
             for i in range(0, len(instruments), num_columns):
                 row = instruments[i:i+num_columns]
-                # Używamy ljust do wyrównania tekstu w kolumnach
+                # Użycie ljust do wyrównania tekstu w kolumnach
                 print("".join(name.ljust(col_width) for name in row))
 
             print("-" * 80)
