@@ -74,7 +74,8 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
     # Zapamiętanie oryginalnych nazw kolumn przed dodatniem nowych
     original_cols_names = set(df.columns)
     
-    # Obliczenie ADX, append=True -> dodanie do df wyników wywołania funkcji ADX
+    # Obliczenie ADX, append=True -> dodanie do df wyników wywołania 
+    # funkcji ADX
     df.ta.adx(append=True, **kwargs)
     
     # Identyfikacja nowych kolumn dodanych przez funkcję
@@ -103,12 +104,14 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
     # Sprawdzenie potrzeby standaryzacji i wykonanie jej, jesli jest wymagana
     if not df[dmp_col].dropna().empty and df[dmp_col].dropna().max() <= 1.0:
         df[f'{dmp_col}_scaled'] = df[dmp_col] * 100
-        # Jesli dojdzie do utworzenia nowej kolumny - trzeba zaktualizaować dmp_col
+        # Jesli dojdzie do utworzenia nowej kolumny - trzeba zaktualizaować 
+        # dmp_col
         dmp_col = f'{dmp_col}_scaled'
         
     if not df[dmn_col].dropna().empty and df[dmn_col].dropna().max() <= 1.0:
         df[f'{dmn_col}_scaled'] = df[dmn_col] * 100
-        # Jesli dojdzie do utworzenia nowej kolumny - trzeba zaktualizaować dmp_col
+        # Jesli dojdzie do utworzenia nowej kolumny - trzeba zaktualizaować 
+        # dmp_col
         dmn_col = f'{dmn_col}_scaled'
         
     # --- Dodanie flag indetyfikujących trend ---
@@ -118,7 +121,8 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
     
     # Warunki określające stan rynku
     is_trending = df[adx_col] > trend_threshold
-    is_forming = df[adx_col] > forming_trend_threshold and df[adx_col].diff() > 0
+    is_forming = df[adx_col] > forming_trend_threshold \
+        and df[adx_col].diff() > 0
     trend_direction = df[dmp_col] > df[dmn_col]
 
     # Status trendu
@@ -147,7 +151,9 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
         'Downward'
         ]
     
-    df['trend_direction'] = np.select(direction_conditions, direction_choices, default='Lateral')
+    df['trend_direction'] = np.select(direction_conditions, 
+                                      direction_choices, 
+                                      default='Lateral')
     
     # Zwrot df z wyliczonymi wskaźnikami i flagami
     return df
