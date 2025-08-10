@@ -122,7 +122,7 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
     # Warunki określające stan rynku
     is_trending = df[adx_col] > trend_threshold
     is_forming = df[adx_col] > forming_trend_threshold \
-        and df[adx_col].diff() > 0
+        & df[adx_col].diff() > 0
     trend_direction = df[dmp_col] > df[dmn_col]
 
     # Status trendu
@@ -136,7 +136,7 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
         'Forming'
         ]
     
-    df['trend_status'] = np.selection(status_conditions, 
+    df['trend_status'] = np.select(status_conditions, 
                                       status_choices, 
                                       default = 'Consolidation')
 
