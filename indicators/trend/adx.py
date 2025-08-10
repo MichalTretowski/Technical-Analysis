@@ -33,7 +33,7 @@ DMN <- 0-100 lub 0-1
 
 # Funkcja obliczająca ADX
 def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
-                  trend_threshold=45, **kwargs):
+                  trend_threshold=45, col_suffix: str = '', **kwargs):
     """
     Oblicza wskaźnik ADX, standaryzuje go i dodaje go do DataFrame.
 
@@ -59,6 +59,10 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
                                 dla którego uznajemy, 
                                 że mamy silny trend. 
                                 Default: 45
+        col_suffix (str): Dodatek do nazw tworzonych kolumn pozwalający
+                            zapobiec nadpisywaniu danych w przypadku
+                            wielokrotnego wywowałnia funkcji w pentli
+                            zmieniającej parametry funkcji
     Returns:
         pd.DataFrame: DataFrame z dodanymi kolumnami ADX, DMP, DMN
         Jesli trzeba ustandaryzować dane w kolumnach DMP i DMN
@@ -103,16 +107,16 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
 
     # Sprawdzenie potrzeby standaryzacji i wykonanie jej, jesli jest wymagana
     if not df[dmp_col].dropna().empty and df[dmp_col].dropna().max() <= 1.0:
-        df[f'{dmp_col}_scaled'] = df[dmp_col] * 100
+        df[f'{dmp_col}_scaled_{col_suffix}'] = df[dmp_col] * 100
         # Jesli dojdzie do utworzenia nowej kolumny - trzeba zaktualizaować 
         # dmp_col
-        dmp_col = f'{dmp_col}_scaled'
+        dmp_col = f'{dmp_col}_scaled_{col_suffix}'
         
     if not df[dmn_col].dropna().empty and df[dmn_col].dropna().max() <= 1.0:
-        df[f'{dmn_col}_scaled'] = df[dmn_col] * 100
+        df[f'{dmn_col}_scaled_{col_suffix}'] = df[dmn_col] * 100
         # Jesli dojdzie do utworzenia nowej kolumny - trzeba zaktualizaować 
         # dmp_col
-        dmn_col = f'{dmn_col}_scaled'
+        dmn_col = f'{dmn_col}_scaled_{col_suffix}'
         
     # --- Dodanie flag indetyfikujących trend ---
     adx_col = adx_col_names['adx']
@@ -136,14 +140,16 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
         'Forming'
         ]
     
-    df['trend_status'] = np.select(status_conditions, 
+    df[f'trend_status_{col_suffix}'] = np.select(status_conditions, 
                                       status_choices, 
                                       default = 'Consolidation')
 
     # Kolumna z kierunkiem trendu
     direction_conditions = [
-        (df['trend_status'] != 'Consolidation') & trend_direction,
-        (df['trend_status'] != 'Consolidation') & ~trend_direction
+        (df[f'trend_status_{col_suffix}'] != 'Consolidation') \
+            & trend_direction,
+        (df[f'trend_status_{col_suffix}'] != 'Consolidation') \
+            & ~trend_direction
         ]
 
     direction_choices = [
@@ -151,7 +157,7 @@ def calculate_adx(df: pd.DataFrame, forming_trend_threshold=25,
         'Downward'
         ]
     
-    df['trend_direction'] = np.select(direction_conditions, 
+    df[f'trend_direction_{col_suffix}'] = np.select(direction_conditions, 
                                       direction_choices, 
                                       default='Lateral')
     
